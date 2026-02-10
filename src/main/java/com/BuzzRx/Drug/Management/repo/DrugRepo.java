@@ -8,5 +8,6 @@ import java.util.UUID;
 
 @Repository
 public interface DrugRepo extends JpaRepository<Drug, UUID> {
+//    boolean existByNdc(String ndc);
 
 }

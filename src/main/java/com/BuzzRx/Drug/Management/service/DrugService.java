@@ -13,7 +13,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class DrugService implements DrugInterface {
-    Logger log= LoggerFactory.getLogger(DrugService.class);
+    private static final Logger log= LoggerFactory.getLogger(DrugService.class);
 
     @Autowired
     private DrugRepo drugRepo;
@@ -22,9 +22,9 @@ public class DrugService implements DrugInterface {
         Drug drug=new Drug();
         log.info("Drug save request receive from controller");
         BeanUtils.copyProperties(drugRequest,drug);
-        drugRepo.save(drug);
+        Drug savedDrug = drugRepo.save(drug);
         DrugResponse drugResponse=new DrugResponse();
-        BeanUtils.copyProperties(drug,drugResponse);
+        BeanUtils.copyProperties(savedDrug,drugResponse);
         log.info("drug response send to controller");
         return drugResponse;
     }
