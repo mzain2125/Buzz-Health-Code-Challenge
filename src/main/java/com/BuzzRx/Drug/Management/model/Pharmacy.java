@@ -11,38 +11,43 @@ import java.util.List;
 import java.util.UUID;
 
 @Entity
-@Table(name="drugs",uniqueConstraints = {@UniqueConstraint(columnNames = "ndc")})
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class Drug {
+@Table(name = "pharmacy")
+public class Pharmacy {
 
     @Id
     @GeneratedValue
     private UUID id;
 
+    @Column(nullable = false,unique = true)
+    private String npi;
+
+//    @OneToMany(mappedBy = "pharmacy", cascade = CascadeType.ALL)
+//    private List<Coupon> coupons;
+
     @Column(nullable = false)
     private String name;
 
-//    @OneToMany(mappedBy = "drug", cascade = CascadeType.ALL)
-//    private List<Coupon> coupons;
-
-    @Column(nullable = false,unique = true)
-    private String ndc;
+    @Column(nullable = false)
+    private String address;
 
     @Column(nullable = false)
-    private String strength;
+    private String city;
+
+    @Column(nullable = false,length = 2)
+    private String state;
 
     @Column(nullable = false)
-    private String form;
+    private String zip;
 
     @Column(nullable = false,updatable = false)
     private LocalDateTime createdAt;
 
     @PrePersist
-    public void onCreate() {
-        this.createdAt = LocalDateTime.now();
+    public void onCreate(){
+        this.createdAt=LocalDateTime.now();
     }
-
 }
