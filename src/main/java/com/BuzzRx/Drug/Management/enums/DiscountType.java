@@ -1,4 +1,4 @@
-package com.BuzzRx.Drug.Management;
+package com.BuzzRx.Drug.Management.enums;
 
 public enum DiscountType {
     FLAT,

@@ -30,6 +30,7 @@
 
 package com.BuzzRx.Drug.Management.service;
 
+import com.BuzzRx.Drug.Management.enums.DiscountType;
 import com.BuzzRx.Drug.Management.model.Coupon;
 import com.BuzzRx.Drug.Management.model.Drug;
 import com.BuzzRx.Drug.Management.model.Pharmacy;
@@ -38,10 +39,14 @@ import com.BuzzRx.Drug.Management.repo.DrugRepo;
 import com.BuzzRx.Drug.Management.repo.PharmacyRepo;
 import com.BuzzRx.Drug.Management.request.CouponRequest;
 import com.BuzzRx.Drug.Management.response.CouponResponse;
+import com.BuzzRx.Drug.Management.response.PriceQuoteResponse;
+import com.fasterxml.jackson.annotation.ObjectIdGenerator;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.UUID;
 
 @Service
@@ -165,6 +170,32 @@ public class CouponService {
             response.setPharmacyName(updated.getPharmacyId().getName());
         }
         return response;
+    }
+
+    public void dltCouponById(UUID id){
+        couponRepo.findById(id).orElseThrow(()->new RuntimeException("Coupon Not found with this id: "+id));
+        couponRepo.deleteById(id);
+    }
+
+    public PriceQuoteResponse getPriceOnDiscount(UUID id,BigDecimal quantity){
+        Coupon coupon=couponRepo.findById(id).orElseThrow(()-> new RuntimeException("Coupon Not found with this id: "+id));
+        if (!coupon.getIsActive())
+            throw new RuntimeException("Coupon is not active");
+       if(coupon.getDiscountType()== DiscountType.FLAT)
+       {
+        BigDecimal priceBefore=coupon.getCashPrice().multiply(quantity);
+        BigDecimal priceAfterDiscount=coupon.getCashPrice().subtract(coupon.getDiscountValue());
+        BigDecimal priceWithMinPrice=priceAfterDiscount.max(coupon.getMinPrice());
+        BigDecimal priceAfter=priceWithMinPrice.multiply(quantity);
+           return new PriceQuoteResponse(priceBefore,priceAfter);
+       }
+       BigDecimal priceBefore=coupon.getCashPrice().multiply(quantity);
+
+       BigDecimal calculatePercentage=BigDecimal.ONE.subtract(coupon.getDiscountValue().divide(BigDecimal.valueOf(100),4, RoundingMode.HALF_UP));
+       BigDecimal calculatingPrice=coupon.getCashPrice().multiply(calculatePercentage).max(coupon.getMinPrice());
+       BigDecimal priceAfter=calculatingPrice.multiply(quantity);
+       return new PriceQuoteResponse(priceBefore,priceAfter);
+
     }
 
 

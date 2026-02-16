@@ -1,5 +1,7 @@
 package com.BuzzRx.Drug.Management.service;
 
+import com.BuzzRx.Drug.Management.exceptions.DuplicateResourceException;
+import com.BuzzRx.Drug.Management.exceptions.ResourceNotFoundException;
 import com.BuzzRx.Drug.Management.interfaces.DrugInterface;
 import com.BuzzRx.Drug.Management.model.Drug;
 import com.BuzzRx.Drug.Management.repo.DrugRepo;
@@ -12,35 +14,33 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import javax.management.relation.RelationServiceNotRegisteredException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
 @Service
 public class DrugService implements DrugInterface {
-    private static final Logger log= LoggerFactory.getLogger(DrugService.class);
 
     @Autowired
     private DrugRepo drugRepo;
 
     public DrugResponse saveDrug(DrugRequest drugRequest){
         if(drugRepo.existsByNdc(drugRequest.getNdc())){
-            throw new RuntimeException("Ndc must be Unique");
+            throw new DuplicateResourceException("ndc must be unique");
         }
         Drug drug=new Drug();
-        log.info("Drug save request receive from controller");
         BeanUtils.copyProperties(drugRequest,drug);
         Drug savedDrug = drugRepo.save(drug);
         DrugResponse drugResponse=new DrugResponse();
         BeanUtils.copyProperties(savedDrug,drugResponse);
-        log.info("drug response send to controller");
         return drugResponse;
     }
 
     public List<DrugResponse> findByName(String name){
         List<Drug> drugList=drugRepo.findByNameContainingIgnoreCase(name);
         if(drugList.isEmpty()){
-            throw new RuntimeException("Drug not available");
+            throw new ResourceNotFoundException("Drug not found with this name");
         }
         List<DrugResponse> drugResponseList=new ArrayList<>();
         for(Drug drug:drugList){
@@ -54,7 +54,7 @@ public class DrugService implements DrugInterface {
     public DrugResponse findByNdc(String ndc){
         Drug drug=drugRepo.findByNdc(ndc);
         if(drug==null){
-           throw new RuntimeException("Drug not Found with this ndc: "+ ndc);
+           throw new ResourceNotFoundException("Drug not Found with this ndc: "+ ndc);
         }
         DrugResponse drugResponse=new DrugResponse();
         BeanUtils.copyProperties(drug,drugResponse);
@@ -62,7 +62,7 @@ public class DrugService implements DrugInterface {
     }
 
     public DrugResponse putDrugById(UUID id,DrugRequest drugRequest){
-        Drug drug=drugRepo.findById(id).orElseThrow(()->new RuntimeException("Drug not found with this id: "+id));
+        Drug drug=drugRepo.findById(id).orElseThrow(()->new ResourceNotFoundException("Drug not found with this id: "+id));
         BeanUtils.copyProperties(drugRequest,drug);
         Drug updateDrug=drugRepo.save(drug);
         DrugResponse drugResponse=new DrugResponse();
@@ -71,14 +71,14 @@ public class DrugService implements DrugInterface {
     }
 
     public DrugResponse patchById(UUID id,DrugRequest drugRequest){
-        Drug drug=drugRepo.findById(id).orElseThrow(()->new RuntimeException("Drug not found with this id:"+id));
+        Drug drug=drugRepo.findById(id).orElseThrow(()->new ResourceNotFoundException("Drug not found with this id:"+id));
         if(drugRequest.getName()!=null){
             drug.setName(drugRequest.getName());
         }
         if(drugRequest.getNdc()!=null){
             if (drugRepo.existsByNdc(drugRequest.getNdc())
                     && !drug.getNdc().equals(drugRequest.getNdc())) {
-                throw new RuntimeException("NDC already exists");
+                throw new DuplicateResourceException("NDC already exists");
             }
             drug.setNdc(drugRequest.getNdc());
         }
@@ -95,7 +95,7 @@ public class DrugService implements DrugInterface {
     }
 
     public void dltById(UUID id){
-        Drug drug=drugRepo.findById(id).orElseThrow(()->new RuntimeException("Drug don't exist"));
+        Drug drug=drugRepo.findById(id).orElseThrow(()->new ResourceNotFoundException("Drug don't exist"));
         drugRepo.delete(drug);
     }
 

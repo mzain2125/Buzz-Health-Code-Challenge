@@ -1,13 +1,12 @@
 package com.BuzzRx.Drug.Management.model;
 
-import com.BuzzRx.Drug.Management.DiscountType;
+import com.BuzzRx.Drug.Management.enums.DiscountType;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import javax.annotation.processing.Generated;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;

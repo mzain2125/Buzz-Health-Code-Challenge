@@ -1,6 +1,6 @@
 package com.BuzzRx.Drug.Management.request;
 
-import com.BuzzRx.Drug.Management.DiscountType;
+import com.BuzzRx.Drug.Management.enums.DiscountType;
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;

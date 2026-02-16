@@ -2,6 +2,7 @@ package com.BuzzRx.Drug.Management.controller;
 
 import com.BuzzRx.Drug.Management.repo.DrugRepo;
 import com.BuzzRx.Drug.Management.request.DrugRequest;
+import com.BuzzRx.Drug.Management.response.BaseResponse;
 import com.BuzzRx.Drug.Management.response.DrugResponse;
 import com.BuzzRx.Drug.Management.service.DrugService;
 import jakarta.validation.Valid;
@@ -19,7 +20,6 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/api/drug")
 public class DrugController {
-    private static final Logger log= LoggerFactory.getLogger(DrugController.class);
 
     @Autowired
     private DrugService drugService;
@@ -27,20 +27,32 @@ public class DrugController {
     private DrugRepo drugRepo;
 
     @PostMapping
-    public ResponseEntity<?> saveDrug(@RequestBody DrugRequest drugRequest){
+    public ResponseEntity<BaseResponse<DrugResponse>> saveDrug(@RequestBody DrugRequest drugRequest){
 
-        log.info("Drug is created with ths Name={}",drugRequest.getName());
         DrugResponse drugResponse=drugService.saveDrug(drugRequest);
-        return ResponseEntity.status(HttpStatus.CREATED).body(drugResponse);
+        BaseResponse<DrugResponse> baseResponse=new BaseResponse<>();
+        baseResponse.setMessage("Successfully Created");
+        baseResponse.setData(drugResponse);
+        baseResponse.setCode(HttpStatus.CREATED.value());
+        baseResponse.setSuccess(true);
+        return ResponseEntity.ok(baseResponse);
 
     }
 
     @GetMapping("/name/{name}")
     public ResponseEntity<?>findByName(@PathVariable String name){
         List<DrugResponse> drugResponseList=drugService.findByName(name);
-        return ResponseEntity.ok(drugResponseList);
+        return ResponseEntity.ok(BaseResponse.getResponse(true,"get successfully",HttpStatus.FOUND.value(),drugResponseList));
     }
 
+    public BaseResponse<?> getResponse(boolean success, String message,int code, Object data){
+        BaseResponse<Object> response=new BaseResponse<>();
+        response.setCode(code);
+        response.setSuccess(success);
+        response.setData(data);
+        response.setMessage(message);
+        return response;
+    }
     @GetMapping("/ndc/{ndc}")
     public ResponseEntity<?>findByNdc(@PathVariable String ndc){
         DrugResponse drugResponse=drugService.findByNdc(ndc);

@@ -1,6 +1,6 @@
 package com.BuzzRx.Drug.Management.response;
 
-import com.BuzzRx.Drug.Management.DiscountType;
+import com.BuzzRx.Drug.Management.enums.DiscountType;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
