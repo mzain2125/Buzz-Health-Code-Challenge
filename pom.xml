@@ -50,7 +50,7 @@
 			<scope>runtime</scope>
 		</dependency>
 
-		<!-- Lombok (IMPORTANT) -->
+		<!-- Lombok -->
 		<dependency>
 			<groupId>org.projectlombok</groupId>
 			<artifactId>lombok</artifactId>
@@ -58,7 +58,7 @@
 			<scope>provided</scope>
 		</dependency>
 
-		<!-- OpenAPI / Swagger -->
+		<!-- Springdoc OpenAPI UI -->
 		<dependency>
 			<groupId>org.springdoc</groupId>
 			<artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
@@ -77,7 +77,7 @@
 	<build>
 		<plugins>
 
-			<!-- Lombok Annotation Processing -->
+			<!-- Compiler plugin -->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
@@ -95,7 +95,7 @@
 				</configuration>
 			</plugin>
 
-			<!-- Spring Boot Plugin -->
+			<!-- Spring Boot plugin -->
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>

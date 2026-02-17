@@ -7,14 +7,10 @@ import com.BuzzRx.Drug.Management.model.Drug;
 import com.BuzzRx.Drug.Management.repo.DrugRepo;
 import com.BuzzRx.Drug.Management.request.DrugRequest;
 import com.BuzzRx.Drug.Management.response.DrugResponse;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
-import javax.management.relation.RelationServiceNotRegisteredException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -61,6 +57,13 @@ public class DrugService implements DrugInterface {
         return drugResponse;
     }
 
+    public DrugResponse findById(UUID id){
+        Drug drug=drugRepo.findById(id).orElseThrow(()-> new ResourceNotFoundException("Drug not Found with this ndc: "+ id));
+        DrugResponse drugResponse=new DrugResponse();
+        BeanUtils.copyProperties(drug,drugResponse);
+        return drugResponse;
+    }
+
     public DrugResponse putDrugById(UUID id,DrugRequest drugRequest){
         Drug drug=drugRepo.findById(id).orElseThrow(()->new ResourceNotFoundException("Drug not found with this id: "+id));
         BeanUtils.copyProperties(drugRequest,drug);
@@ -100,6 +103,9 @@ public class DrugService implements DrugInterface {
     }
 
     public void dltAll(){
+       if(drugRepo.findAll().isEmpty()){
+           throw new ResourceNotFoundException("Drug Table is Already empty");
+       }
         drugRepo.deleteAll();
     }
 

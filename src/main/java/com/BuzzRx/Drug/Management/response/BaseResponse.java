@@ -17,12 +17,21 @@ public class BaseResponse <T> {
     private T data;
     private int code;
 
-    public static BaseResponse<?> getResponse(boolean success, String message,int code, Object data){
+    public static BaseResponse<?> successResponse(boolean success, String message,int code, Object data){
         BaseResponse<Object> response=new BaseResponse<>();
         response.setCode(code);
         response.setSuccess(success);
         response.setData(data);
         response.setMessage(message);
+        return response;
+    }
+
+    public static BaseResponse<?> failureResponse(String message,int code){
+        BaseResponse<Object> response=new BaseResponse<>();
+        response.setCode(code);
+        response.setData(null);
+        response.setMessage(message);
+        response.setSuccess(false);
         return response;
     }
 }

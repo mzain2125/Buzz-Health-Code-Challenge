@@ -1,5 +1,6 @@
 package com.BuzzRx.Drug.Management.controller;
 
+import com.BuzzRx.Drug.Management.model.Drug;
 import com.BuzzRx.Drug.Management.repo.DrugRepo;
 import com.BuzzRx.Drug.Management.request.DrugRequest;
 import com.BuzzRx.Drug.Management.response.BaseResponse;
@@ -27,60 +28,45 @@ public class DrugController {
     private DrugRepo drugRepo;
 
     @PostMapping
-    public ResponseEntity<BaseResponse<DrugResponse>> saveDrug(@RequestBody DrugRequest drugRequest){
-
+    public ResponseEntity<?> saveDrug(@RequestBody DrugRequest drugRequest){
         DrugResponse drugResponse=drugService.saveDrug(drugRequest);
-        BaseResponse<DrugResponse> baseResponse=new BaseResponse<>();
-        baseResponse.setMessage("Successfully Created");
-        baseResponse.setData(drugResponse);
-        baseResponse.setCode(HttpStatus.CREATED.value());
-        baseResponse.setSuccess(true);
-        return ResponseEntity.ok(baseResponse);
-
+        return ResponseEntity.status(HttpStatus.CREATED).body(BaseResponse.successResponse(true,"Successfully Created",HttpStatus.CREATED.value(),drugResponse));
     }
 
     @GetMapping("/name/{name}")
     public ResponseEntity<?>findByName(@PathVariable String name){
         List<DrugResponse> drugResponseList=drugService.findByName(name);
-        return ResponseEntity.ok(BaseResponse.getResponse(true,"get successfully",HttpStatus.FOUND.value(),drugResponseList));
+        return ResponseEntity.ok(BaseResponse.successResponse(true,"get successfully",HttpStatus.OK.value(),drugResponseList));
     }
 
-    public BaseResponse<?> getResponse(boolean success, String message,int code, Object data){
-        BaseResponse<Object> response=new BaseResponse<>();
-        response.setCode(code);
-        response.setSuccess(success);
-        response.setData(data);
-        response.setMessage(message);
-        return response;
-    }
     @GetMapping("/ndc/{ndc}")
     public ResponseEntity<?>findByNdc(@PathVariable String ndc){
         DrugResponse drugResponse=drugService.findByNdc(ndc);
-        return ResponseEntity.ok(drugResponse);
+        return ResponseEntity.ok(BaseResponse.successResponse(true,"Get successfully",HttpStatus.OK.value(),drugResponse));
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<?>PutDrugById(@PathVariable UUID id,@RequestBody DrugRequest drugRequest){
         DrugResponse drugResponse=drugService.putDrugById(id,drugRequest);
-        return ResponseEntity.ok(drugResponse);
+        return ResponseEntity.ok(BaseResponse.successResponse(true,"Changes done Successfully",HttpStatus.OK.value(), drugResponse));
     }
 
     @PatchMapping("/{id}")
     public ResponseEntity<?>patchDrugById(@PathVariable UUID id,@RequestBody DrugRequest drugRequest){
         DrugResponse drugResponse=drugService.patchById(id,drugRequest);
-        return ResponseEntity.ok(drugResponse);
+        return ResponseEntity.ok(BaseResponse.successResponse(true,"Changes done Successfully",HttpStatus.OK.value(), drugResponse));
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<?>dltById(@PathVariable UUID id){
-        drugService.dltById(id);
-       return ResponseEntity.noContent().build();
+       drugService.dltById(id);
+       return ResponseEntity.ok(BaseResponse.successResponse(true,"Successfully Deleted",HttpStatus.OK.value(), null));
     }
 
     @DeleteMapping
     public ResponseEntity<?> dltAll(){
         drugService.dltAll();
-        return ResponseEntity.ok("All Drugs Successfully Deleted");
+        return ResponseEntity.ok(BaseResponse.successResponse(true,"Successfully Deleted",HttpStatus.OK.value(), null));
     }
 
 }
